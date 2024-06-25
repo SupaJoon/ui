@@ -12,6 +12,7 @@ import AnsiRow from "../AnsiRow";
 import ResmokeRow from "../ResmokeRow";
 import SectionHeader from "../SectionHeader";
 import SkippedLinesRow from "../SkippedLinesRow";
+import SubsectionHeader from "../SubsectionHeader";
 
 type RowRendererFunction = (props: {
   processedLogLines: ProcessedLogLines;
@@ -87,7 +88,16 @@ const ParsleyRow: RowRendererFunction = ({ processedLogLines }) => {
     }
 
     if (isSubsectionHeaderRow(processedLogLine)) {
-      return <div>subsection start</div>;
+      return (
+        <SubsectionHeader
+          commandID={processedLogLine.commandID}
+          commandName={processedLogLine.commandName}
+          functionID={processedLogLine.functionID}
+          lineIndex={index}
+          onOpen={openSection}
+          open={processedLogLine.isOpen}
+        />
+      );
     }
 
     return (
