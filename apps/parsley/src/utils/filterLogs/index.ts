@@ -1,3 +1,5 @@
+import SkippedLinesRow from "components/LogRow/SkippedLinesRow";
+import { log } from "console";
 import { SectionState } from "hooks/useSections";
 import { CommandEntry, SectionData } from "hooks/useSections/utils";
 import {
@@ -8,7 +10,7 @@ import {
 } from "types/logs";
 import { isExpanded } from "utils/expandedLines";
 import { newSkippedLinesRow } from "utils/logRow";
-import { isSkippedLinesRow } from "utils/logRowTypes";
+import { isSectionHeaderRow, isSkippedLinesRow, isSubsectionHeaderRow } from "utils/logRowTypes";
 
 type FilterLogsParams = {
   logLines: string[];
@@ -71,6 +73,7 @@ const filterLogs = (options: FilterLogsParams): ProcessedLogLines => {
     sectioningEnabled,
     shareLine,
   } = options;
+  console.log(sectionState)
   // If there are no filters or expandable rows is not enabled, then we only have to process sections if they exist and are enabled.
   if (matchingLines === undefined) {
     if (sectioningEnabled && sectionData?.functions.length && sectionState) {
@@ -125,9 +128,33 @@ const filterLogs = (options: FilterLogsParams): ProcessedLogLines => {
     return logLines.map((_, idx) => idx);
   }
 
-  const filteredLines: ProcessedLogLines = [];
-
+  let filteredLines: ProcessedLogLines = [];
+  let funcIndex = 0;
+  let commandIndex = 0;
   logLines.reduce((arr, _logLine, idx) => {
+    if(sectioningEnabled && sectionData?.functions.length && sectionState) {
+    const func = sectionData?.functions[funcIndex];
+    const isFuncStart = func && idx === func.range.start;
+
+    const command = sectionData?.commands[commandIndex];
+    const isCommandStart = command && idx === command.range.start;
+    if(isFuncStart) {
+      filteredLines.push({
+        ...func,
+        isOpen: true,
+        rowType: RowType.SectionHeader,
+      }); 
+      funcIndex += 1;
+    }
+    // if(isCommandStart) {
+    //   filteredLines.push({
+    //     ...command,
+    //     isOpen: true,
+    //     rowType: RowType.SubsectionHeader,
+    //   });
+    //   commandIndex += 1;
+    // }
+  }
     // Bookmarks, expanded lines, and the share line should always remain uncollapsed.
     if (
       bookmarks.includes(idx) ||
@@ -156,8 +183,31 @@ const filterLogs = (options: FilterLogsParams): ProcessedLogLines => {
     }
     return arr;
   }, filteredLines);
-
-  return filteredLines;
+  
+  if(sectioningEnabled && sectionData?.functions.length && sectionState) {
+  const res:ProcessedLogLines = [];
+  for (let idx = 0; idx < filteredLines.length; idx++) {
+    const line = filteredLines[idx];
+    res.push(line);
+    if(isSectionHeaderRow(line)) {
+     let hasMatch = false
+     let i = idx + 1
+      for( i ; !isSectionHeaderRow(filteredLines[i]) && i < filteredLines.length; i++) {
+        if(typeof filteredLines[i] === 'number') {
+          hasMatch = true
+          console.log('hasMatch', hasMatch)
+        }
+      }
+      if(!hasMatch) {
+        line.isOpen = false
+        idx = i - 1
+      }
+    }
+  }
+  filteredLines = res
+}
+return filteredLines
 };
+
 
 export default filterLogs;
