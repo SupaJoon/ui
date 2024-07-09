@@ -146,14 +146,15 @@ const filterLogs = (options: FilterLogsParams): ProcessedLogLines => {
       }); 
       funcIndex += 1;
     }
-    // if(isCommandStart) {
-    //   filteredLines.push({
-    //     ...command,
-    //     isOpen: true,
-    //     rowType: RowType.SubsectionHeader,
-    //   });
-    //   commandIndex += 1;
-    // }
+    // comment this out to omit subsections
+    if(isCommandStart) {
+      filteredLines.push({
+        ...command,
+        isOpen: true,
+        rowType: RowType.SubsectionHeader,
+      });
+      commandIndex += 1;
+    }
   }
     // Bookmarks, expanded lines, and the share line should always remain uncollapsed.
     if (
@@ -183,7 +184,8 @@ const filterLogs = (options: FilterLogsParams): ProcessedLogLines => {
     }
     return arr;
   }, filteredLines);
-  
+
+  // comment this out to make all sections open
   if(sectioningEnabled && sectionData?.functions.length && sectionState) {
   const res:ProcessedLogLines = [];
   for (let idx = 0; idx < filteredLines.length; idx++) {
