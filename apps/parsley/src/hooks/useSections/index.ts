@@ -33,6 +33,8 @@ export interface UseSectionsResult {
   sectioningEnabled: boolean;
   sectioningInitialized: boolean;
   openSectionContainingLineNumber: (lineNumber: number) => void;
+  openAll: () => void;
+  closeAll: () => void;
 }
 
 interface Props {
@@ -131,7 +133,14 @@ export const useSections = ({
     },
     [setSectionState, sectionData],
   );
-
+  const openAll = () => {
+    if(sectionData)
+    setSectionState(populateSectionState(sectionData,true ));
+  }
+  const closeAll = () => {
+    if(sectionData)
+    setSectionState(populateSectionState(sectionData,false ));
+  }
   return {
     openSectionContainingLineNumber,
     sectionData,
@@ -140,17 +149,19 @@ export const useSections = ({
     sectioningInitialized,
     toggleCommandSection,
     toggleFunctionSection,
+openAll,
+closeAll
   };
 };
 
-const populateSectionState = (sectionData: SectionData): SectionState => {
+const populateSectionState = (sectionData: SectionData, isOpen: boolean = false): SectionState => {
   const { commands, functions } = sectionData;
   const sectionState: SectionState = {};
   functions.forEach(({ functionID }) => {
-    sectionState[functionID] = { commands: {}, isOpen: false };
+    sectionState[functionID] = { commands: {}, isOpen };
   });
   commands.forEach(({ commandID, functionID }) => {
-    sectionState[functionID].commands[commandID] = { isOpen: false };
+    sectionState[functionID].commands[commandID] = { isOpen };
   });
   return sectionState;
 };

@@ -33,7 +33,7 @@ import { ExpandedLines, ProcessedLogLines } from "types/logs";
 import filterLogs from "utils/filterLogs";
 import { getMatchingLines } from "utils/matchingLines";
 import { getColorMapping } from "utils/resmoke";
-import searchLogs from "utils/searchLogs";
+import searchLogs, { hiddenLines } from "utils/searchLogs";
 import useLogState from "./state";
 import { DIRECTION, LogMetadata, Preferences, SearchState } from "./types";
 import { getNextPage } from "./utils";
@@ -209,7 +209,7 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
   const scrollToLine = useCallback((lineNumber: number) => {
     listRef.current?.scrollToIndex(lineNumber);
   }, []);
-
+  
   const searchResults = useMemo(() => {
     const results = state.searchState.searchTerm
       ? searchLogs({
@@ -234,6 +234,14 @@ const LogContextProvider: React.FC<LogContextProviderProps> = ({
     getLine,
     dispatch,
   ]);
+
+  useEffect(() => {
+    const openThese = hiddenLines({lines: state.logs, searchRegex: state.searchState.searchTerm})
+    openThese.forEach((line) => {
+      sectioning.openSectionContainingLineNumber(line)
+    })
+  }, [state.searchState.searchTerm])
+  
 
   const stringifiedSearchResults = searchResults.toString();
   useEffect(() => {

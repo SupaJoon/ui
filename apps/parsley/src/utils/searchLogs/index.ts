@@ -42,5 +42,22 @@ const searchLogs = (options: searchOptions): number[] => {
   }
   return matchingIndices;
 };
+interface props {
+  searchRegex: RegExp | undefined;
+  lines: string[];
+}
+
+export const hiddenLines = (options: props): number[] => {
+  const { lines, searchRegex} =
+  options;
+const matchingIndices: number[] = [];
+for (let i = 0; i < lines.length; i++) {
+      if (searchRegex?.test(lines[i])) {
+        // We want to match the index of the processedLogLines array, not the line number
+        matchingIndices.push(i);
+      }
+    }
+  return matchingIndices;
+}
 
 export default searchLogs;

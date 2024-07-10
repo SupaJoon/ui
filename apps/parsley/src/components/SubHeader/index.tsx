@@ -5,12 +5,13 @@ import Icon from "components/Icon";
 import { size, subheaderHeight } from "constants/tokens";
 import { useLogContext } from "context/LogContext";
 import { EvergreenTaskSubHeader } from "./EvergreenTaskSubHeader";
+import Button from "@leafygreen-ui/button";
 
 const { gray } = palette;
 
 interface SubHeaderProps {}
 const SubHeader: React.FC<SubHeaderProps> = () => {
-  const { isUploadedLog, logMetadata } = useLogContext();
+  const { isUploadedLog, logMetadata, sectioning } = useLogContext();
   const { buildID, execution, fileName, groupID, logType, taskID, testID } =
     logMetadata || {};
 
@@ -45,6 +46,8 @@ const SubHeader: React.FC<SubHeaderProps> = () => {
               testID={testID as string}
             />
           )}
+            <Button onClick={sectioning.openAll}>Open all</Button>
+            <Button onClick={sectioning.closeAll}>Close all</Button>
         </Header>
       )}
     </Container>
