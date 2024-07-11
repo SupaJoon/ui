@@ -78,7 +78,7 @@ const LogPane: React.FC<LogPaneProps> = ({ rowCount, rowRenderer }) => {
       }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listRef, performedScroll, settings, sectioningInitialized]);
+  }, [listRef, performedScroll, settings, sectioningInitialized, processedLogLines]);
 
   return (
     <PaginatedVirtualList
